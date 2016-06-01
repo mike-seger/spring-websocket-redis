@@ -1,4 +1,4 @@
-spring.redis.host: redishost
+spring.redis.host: 192.168.59.103
 
 logging:
   level:

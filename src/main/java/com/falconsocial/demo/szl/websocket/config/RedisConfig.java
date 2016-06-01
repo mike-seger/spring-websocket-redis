@@ -1,11 +1,15 @@
 package com.falconsocial.demo.szl.websocket.config;
 
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.config.java.AbstractCloudConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -75,4 +79,33 @@ public class RedisConfig {
 
         return container;
     }
+    
+	@Configuration
+	@Profile("cloud")
+	static class CloudConfiguration extends AbstractCloudConfig {
+		@Bean
+		public JedisConnectionFactory jedisConnectionFactory() {
+			return new JedisConnectionFactory();
+		}
+	}
+
+	@Configuration
+	@Profile("default")
+	static class LocalConfiguration {
+		@Value("${redis.client.host}")
+		private String host;
+		@Value("${redis.client.port}")
+		private int port;
+//		@Value("${redis.client.password}")
+//		private String password;
+		
+		@Bean
+		public JedisConnectionFactory jedisConnectionFactory() throws UnknownHostException {
+			JedisConnectionFactory factory = new JedisConnectionFactory();
+			factory.setHostName(host);
+			factory.setPort(port);
+			//factory.setPassword(password);
+			return factory;
+		}
+	}
 }
