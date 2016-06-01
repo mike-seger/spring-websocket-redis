@@ -1,4 +1,0 @@
-redis:
-  client:
-    host:         redishost
-    port:         6379
